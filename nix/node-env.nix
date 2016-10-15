@@ -205,6 +205,12 @@ let
         
         if [ "$dontNpmInstall" != "1" ]
         then
+            # NPM tries to download packages even when they already exist if npm-shrinkwrap is used.
+            if [ -e npm-shrinkwrap.json ]
+            then
+                rm npm-shrinkwrap.json
+            fi
+
             npm --registry http://www.example.com --nodedir=${nodeSources} ${npmFlags} ${stdenv.lib.optionalString production "--production"} install
         fi
         
@@ -265,6 +271,12 @@ let
           npm --registry http://www.example.com --nodedir=${nodeSources} ${npmFlags} ${stdenv.lib.optionalString production "--production"} rebuild
           
           ${stdenv.lib.optionalString (!dontNpmInstall) ''
+            # NPM tries to download packages even when they already exist if npm-shrinkwrap is used.
+            if [ -e npm-shrinkwrap.json ]
+            then
+                rm npm-shrinkwrap.json
+            fi
+
             npm --registry http://www.example.com --nodedir=${nodeSources} ${npmFlags} ${stdenv.lib.optionalString production "--production"} install
           ''}
 
