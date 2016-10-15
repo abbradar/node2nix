@@ -121,7 +121,7 @@ let
       if [ -f "${src}" ]
       then
           # Figure out what directory has been unpacked
-          packageDir=$(find . -type d -maxdepth 1 | tail -1)
+          packageDir="$(find . -type d -maxdepth 1 | tail -1)"
           
           # Restore write permissions to make building work
           find "$packageDir" -type d -print0 | xargs -0 chmod u+x
@@ -131,16 +131,16 @@ let
           mv "$packageDir" "$DIR/${packageName}"
       elif [ -d "${src}" ]
       then
+          # Get a stripped name (without hash) of the source directory.
+          strippedName="$(stripHash ${src})"
+
           # Restore write permissions to make building work
-          chmod -R u+w $strippedName
+          chmod -R u+w "$strippedName"
           
           # Move the extracted directory into the output folder
-          mv $strippedName "$DIR/${packageName}"
+          mv "$strippedName" "$DIR/${packageName}"
       fi
 
-      # Unset the stripped name to not confuse the next unpack step
-      unset strippedName
-      
       # Some version specifiers (latest, unstable, URLs, file paths) force NPM to make remote connections or consult paths outside the Nix store.
       # The following JavaScript replaces these by * to prevent that
       cd "$DIR/${packageName}"
